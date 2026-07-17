@@ -292,11 +292,11 @@
     metalness: 0.0,
     roughness: 0.05,
     transmission: 0.95,
-    thickness: 0.4,
+    thickness: 0.15,
     ior: 1.5,
     transparent: true,
-    opacity: 0.5,
-    reflectivity: 0.35,
+    opacity: 0.2,
+    reflectivity: 0.3,
     clearcoat: 0.6,
     clearcoatRoughness: 0.08,
     side: THREE.DoubleSide,
@@ -574,33 +574,35 @@
         .replace('#include <common>', `#include <common>
           varying vec3 vLocalPos;
           vec3 applyStripe(vec3 col, float z, float c, float hw, float edge){
-            vec3 white=vec3(0.96,0.97,0.97);
-            vec3 black=vec3(0.03,0.02,0.02);
+            vec3 white=vec3(1.0,1.0,1.0);
+            vec3 black=vec3(0.02,0.015,0.015);
             float t=abs(z-c);
-            float bmask = smoothstep(hw, hw+0.006, t) * (1.0 - smoothstep(hw+edge, hw+edge+0.02, t));
-            float wmask = 1.0 - smoothstep(hw-0.02, hw, t);
+            // wide crisp white core, thin black border ring just outside it
+            float wmask = 1.0 - smoothstep(hw, hw+0.012, t);
+            float bmask = smoothstep(hw, hw+0.01, t) * (1.0 - smoothstep(hw+edge, hw+edge+0.02, t));
             col = mix(col, black, bmask);
             col = mix(col, white, wmask);
             return col;
           }
           vec3 fishBody(vec3 p){
-            vec3 orange = vec3(1.0,0.427,0.0);   // #FF6D00
-            vec3 belly  = vec3(1.0,0.58,0.22);
-            vec3 col = mix(orange, belly, smoothstep(0.1,-0.7,p.y));
+            // red-leaning orange so ACES tonemapping lands on vivid orange, not gold
+            vec3 orange = vec3(1.0,0.34,0.0);
+            vec3 belly  = vec3(1.0,0.52,0.18);
+            vec3 col = mix(orange, belly, smoothstep(0.05,-0.7,p.y));
             float z = p.z;                         // head at +Z
-            col = applyStripe(col, z,  0.95, 0.17, 0.05);  // head stripe
-            col = applyStripe(col, z,  0.02, 0.19, 0.05);  // mid stripe
-            col = applyStripe(col, z, -1.05, 0.13, 0.045); // tail stripe
+            col = applyStripe(col, z,  0.95, 0.19, 0.035); // head stripe
+            col = applyStripe(col, z,  0.02, 0.21, 0.035); // mid stripe
+            col = applyStripe(col, z, -1.05, 0.14, 0.03);  // tail stripe
             return col;
           }`)
         .replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb = fishBody(vLocalPos);');
     };
-    mat.customProgramCacheKey = () => 'clownfishBodyV1';
+    mat.customProgramCacheKey = () => 'clownfishBodyV2';
     return mat;
   }
 
   const finMat = new THREE.MeshStandardMaterial({
-    color: 0xff7a1a, roughness: 0.45, metalness: 0.0,
+    color: 0xff5a12, roughness: 0.45, metalness: 0.0,
     side: THREE.DoubleSide, transparent: true, opacity: 0.94
   });
   // Caudal (tail) fin — forked shape in XY, rotated into ZY plane.
