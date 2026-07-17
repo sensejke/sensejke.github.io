@@ -50,7 +50,7 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "/libs/three@0.169.0/three.module.min.js"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"
     }
   }
   </script>
@@ -603,10 +603,6 @@
     color: 0xff7a1a, roughness: 0.45, metalness: 0.0,
     side: THREE.DoubleSide, transparent: true, opacity: 0.94
   });
-  const finEdgeDark = new THREE.MeshStandardMaterial({
-    color: 0x1a1a1a, roughness: 0.5, side: THREE.DoubleSide
-  });
-
   // Caudal (tail) fin — forked shape in XY, rotated into ZY plane.
   function makeTailGeometry() {
     const s = new THREE.Shape();
